@@ -2,14 +2,25 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import * as Location from 'expo-location';
 import { Alert, StyleSheet, Text, View } from 'react-native';
+import axios from 'axios';
 
 import Loading from './Loading';
+
+const API_KEY = '59ac9f398ff130acfb0efbb872dabe2b';
 
 export default class App extends React.Component {
 
   // Состояние - мы находимся в загрузке ГЕО позиции, или мы уже загрузились.
   state = {
     isLoading: true
+  }
+
+  // запрос погоды
+  getWeather = async (latitude, longitude) => {
+
+    const {data} = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`);
+
+    console.log(data);
   }
 
   // Асинхроная функция
@@ -31,9 +42,11 @@ export default class App extends React.Component {
       //console.log(coords.latitude, coords.longitude);
       const {coords: {latitude, longitude}} = await Location.getCurrentPositionAsync();
       console.log(latitude, longitude);
-      this.setState({isLoading: false});
-      // TODO [Запрос с API надо]
 
+      // TODO [Запрос с API надо]
+      this.getWeather(latitude, longitude);
+
+      this.setState({isLoading: false});
 
     }catch (error){
       Alert.alert('Не могу определить местоположение', "Очень грустно :(");
@@ -51,7 +64,7 @@ export default class App extends React.Component {
     const isLoading = this.state.isLoading;
 
     return (
-        isLoading ? <Loading /> : null
+        isLoading ? <Loading /> : <View></View>
     );
   }
 }
