@@ -1,18 +1,44 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import * as Location from 'expo-location';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import Loading from './Loading';
 
 export default class App extends React.Component {
 
+  // Состояние - мы находимся в загрузке ГЕО позиции, или мы уже загрузились.
+  state = {
+    isLoading: true
+  }
+
   // Асинхроная функция
   // React должен подождать выполнение функции getCurrentPositionAsync()
   getLocation = async () => {
 
-    const location = await Location.getCurrentPositionAsync();
-    console.log(location);
+    try {
+      //throw Error();
+
+      // пытаемься получить разрешение на доступ к ГЕО позиции.
+      const response = await Location.requestForegroundPermissionsAsync();
+      console.log(response);
+
+      // пытаемься получить ГЕО позицию
+      //const location = await Location.getCurrentPositionAsync();
+      //console.log(location);
+      // распоковка Обьекта
+      //const {coords} = await Location.getCurrentPositionAsync();
+      //console.log(coords.latitude, coords.longitude);
+      const {coords: {latitude, longitude}} = await Location.getCurrentPositionAsync();
+      console.log(latitude, longitude);
+      this.setState({isLoading: false});
+      // TODO [Запрос с API надо]
+
+
+    }catch (error){
+      Alert.alert('Не могу определить местоположение', "Очень грустно :(");
+    }
+
   }
 
   // componentDidMount - вызывается сразу после монтирования. Метод подходит для настройки подписок.
@@ -21,10 +47,11 @@ export default class App extends React.Component {
   }
 
   render() {
+
+    const isLoading = this.state.isLoading;
+
     return (
-
-        <Loading />
-
+        isLoading ? <Loading /> : null
     );
   }
 }
