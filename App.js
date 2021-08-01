@@ -1,15 +1,32 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
+import * as Location from 'expo-location';
 import { StyleSheet, Text, View } from 'react-native';
 
 import Loading from './Loading';
 
-export default function App() {
-  return (
+export default class App extends React.Component {
 
-      <Loading />
+  // Асинхроная функция
+  // React должен подождать выполнение функции getCurrentPositionAsync()
+  getLocation = async () => {
 
-  );
+    const location = await Location.getCurrentPositionAsync();
+    console.log(location);
+  }
+
+  // componentDidMount - вызывается сразу после монтирования. Метод подходит для настройки подписок.
+  componentDidMount() {
+    this.getLocation();
+  }
+
+  render() {
+    return (
+
+        <Loading />
+
+    );
+  }
 }
 
 const styles = StyleSheet.create({
